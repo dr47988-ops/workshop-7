@@ -37,7 +37,7 @@ test('Viajes: persistencia, participantes, validación y permisos con MongoDB', 
   const outsider = actors.outsider.cookie;
   const body = {name:'Vacaciones', destination:'Liberia', startDate:'2027-01-10', endDate:'2027-01-15'};
   await call('POST', '/trips', body, null, 401);
-  for (const invalid of [null, {}, {...body,owner:actors.outsider.id}, {...body,endDate:'2027-01-01'}, {...body,name:{$ne:''}}, {...body,startDate:'incorrecta'}]) {
+  for (const invalid of [null, {}, {...body,owner:actors.outsider.id}, {...body,endDate:'2027-01-01'}, {...body,name:{$ne:''}}, {...body,startDate:'incorrecta'}, {...body,startDate:'2027-02-30'}, {...body,endDate:'2027-04-31'}, {...body,startDate:'2027-02-29'}]) {
     await call('POST', '/trips', invalid, owner, 400);
   }
   const {data:{trip}} = await call('POST','/trips',body,owner,201);
@@ -69,6 +69,8 @@ test('Viajes: persistencia, participantes, validación y permisos con MongoDB', 
   await call('PATCH',path,{members:[actors.outsider.id]},owner,400);
   await call('PATCH',path,{owner:actors.outsider.id},owner,400);
   await call('PATCH',path,{endDate:'2026-01-01'},owner,400);
+  await call('PATCH',path,{endDate:'2027-02-30'},owner,400);
+  assert.equal((await call('PATCH',path,{endDate:'2028-02-29'},owner,200)).data.trip.endDate,'2028-02-29T00:00:00.000Z');
   await call('PATCH',path,{},owner,400);
   assert.equal((await call('PATCH',path,{destination:'Tamarindo'},owner,200)).data.trip.destination,'Tamarindo');
   assert.equal((await call('GET',path,undefined,member,200)).data.trip.destination,'Tamarindo');
