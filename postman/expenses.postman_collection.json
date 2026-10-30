@@ -1,0 +1,1059 @@
+{
+  "info": {
+    "name": "Workshop 7 - Gastos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.info.iteration === 0 && pm.info.requestName === 'Registrar owner') pm.collectionVariables.set('runId', pm.variables.replaceIn('{{$guid}}')); "
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Registrar owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"owner\",\n  \"email\": \"owner-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar owner\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ownerId', pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar member",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"member\",\n  \"email\": \"member-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar member\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('memberId', pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar outsider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"outsider\",\n  \"email\": \"outsider-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar outsider\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('outsiderId', pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"owner-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión owner\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crear viaje",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Viaje a la playa\",\n  \"destination\": \"Tamarindo\",\n  \"startDate\": \"2027-03-01\",\n  \"endDate\": \"2027-03-05\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Crear viaje\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('tripId', pm.response.json().trip._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agregar participante",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{memberId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Agregar participante\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar gasto equitativo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": 100\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar gasto equitativo\", () => pm.response.to.have.status(201));",
+              "const { expense } = pm.response.json();",
+              "pm.collectionVariables.set('ownerExpenseId', expense._id);",
+              "pm.test('Se reparte entre los 2 miembros', () => pm.expect(expense.splits.map(s => s.amount)).to.eql([50, 50]));",
+              "pm.test('Pagó el usuario autenticado', () => pm.expect(expense.paidBy._id).to.eql(pm.collectionVariables.get('ownerId')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar monto cero",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": 0\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar monto cero\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar monto negativo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": -20\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar monto negativo\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar monto no numérico",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": \"100\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar monto no numérico\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar gasto sin descripción",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 100\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar gasto sin descripción\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar pagador que no es miembro",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": 100,\n  \"paidBy\": \"{{outsiderId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar pagador que no es miembro\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar reparto con suma incorrecta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Tour\",\n  \"amount\": 80,\n  \"splitType\": \"custom\",\n  \"splits\": [\n    {\n      \"user\": \"{{ownerId}}\",\n      \"amount\": 50\n    },\n    {\n      \"user\": \"{{memberId}}\",\n      \"amount\": 20\n    }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar reparto con suma incorrecta\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar viaje con id inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/invalido/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": 100\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar viaje con id inválido\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar viaje inexistente",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/000000000000000000000000/expenses"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar viaje inexistente\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión member",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"member-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión member\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar gasto personalizado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Tour en lancha\",\n  \"amount\": 50,\n  \"splitType\": \"custom\",\n  \"splits\": [\n    {\n      \"user\": \"{{ownerId}}\",\n      \"amount\": 30\n    },\n    {\n      \"user\": \"{{memberId}}\",\n      \"amount\": 20\n    }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar gasto personalizado\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('memberExpenseId', pm.response.json().expense._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar gastos como miembro",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Consultar gastos como miembro\", () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Lista los 2 gastos', () => pm.expect(data.expenses.length).to.eql(2));",
+              "pm.test('Total del viaje', () => pm.expect(data.total).to.eql(150));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Miembro no puede editar gasto ajeno",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{ownerExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Cambio\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Miembro no puede editar gasto ajeno\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Miembro no puede eliminar gasto ajeno",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/expenses/{{ownerExpenseId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Miembro no puede eliminar gasto ajeno\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Creador edita su gasto",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Tour en lancha y snorkel\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Creador edita su gasto\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar edición con monto inválido",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": -1\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar edición con monto inválido\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión outsider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"outsider-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión outsider\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede consultar gastos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede consultar gastos\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede registrar gastos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Intruso\",\n  \"amount\": 10\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede registrar gastos\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede editar gastos",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Intruso\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede editar gastos\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede eliminar gastos",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede eliminar gastos\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"owner-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión owner\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Propietario edita gasto de un miembro",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 60,\n  \"splitType\": \"equal\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Propietario edita gasto de un miembro\", () => pm.response.to.have.status(200));",
+              "pm.test('Reparto recalculado', () => pm.expect(pm.response.json().expense.splits.map(s => s.amount)).to.eql([30, 30]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar gasto inexistente",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/000000000000000000000000",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"X\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar gasto inexistente\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar gasto con id inválido",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/expenses/invalido"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar gasto con id inválido\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Propietario elimina gasto de un miembro",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Propietario elimina gasto de un miembro\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gasto eliminado",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/expenses/{{memberExpenseId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Gasto eliminado\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eliminar viaje",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Eliminar viaje\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gastos eliminados con el viaje",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{ownerExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"X\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Gastos eliminados con el viaje\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cerrar sesión",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/logout",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cerrar sesión\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sin sesión no puede consultar gastos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Sin sesión no puede consultar gastos\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sin sesión no puede registrar gastos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/expenses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Hotel\",\n  \"amount\": 100\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Sin sesión no puede registrar gastos\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sin sesión no puede editar gastos",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/expenses/{{ownerExpenseId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"X\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Sin sesión no puede editar gastos\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sin sesión no puede eliminar gastos",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/expenses/{{ownerExpenseId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Sin sesión no puede eliminar gastos\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
