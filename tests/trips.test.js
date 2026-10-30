@@ -75,5 +75,11 @@ test('Viajes: persistencia, participantes, validación y permisos con MongoDB', 
   await call('DELETE',path,undefined,owner,204);
   await call('GET',path,undefined,owner,404);
   assert.equal((await call('GET','/trips',undefined,member,200)).data.trips.length,0);
+
+  // Logout funciona aunque la cookie esté expirada, sea inválida o no exista, y la borra
+  const {cookie:cleared} = await call('POST','/auth/logout',undefined,'token=token-expirado-o-invalido',200);
+  assert.equal(cleared,'token=');
+  await call('POST','/auth/logout',undefined,null,200);
+  await call('POST','/auth/logout',undefined,member,200);
 });
 

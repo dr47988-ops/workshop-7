@@ -12,8 +12,8 @@ router.post("/register", authController.register);
 // Iniciar sesión
 router.post("/login", authController.login);
 
-// Cerrar sesión
-router.post("/logout", authMiddleware, authController.logout);
+// Cerrar sesión (sin authMiddleware para poder borrar cookies expiradas o inválidas)
+router.post("/logout", authController.logout);
 
 // Consultar usuario autenticado
 router.get("/me", authMiddleware, (req, res) => {
