@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/authRoutes");
 const tripRoutes = require("./routes/tripRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.get("/", (req, res) => {
 // Rutas de autenticación
 app.use("/auth", authRoutes);
 app.use("/trips", tripRoutes);
+app.use("/expenses", expenseRoutes);
 
 // Manejo de rutas inexistentes
 app.use((req, res) => {
