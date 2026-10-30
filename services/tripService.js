@@ -50,6 +50,7 @@ function validateDates(data) {
 }
 
 module.exports = {
+  authorizedTrip,
   async createTrip(userId, body) {
     const data = validateData(body);
     validateDates(data);
