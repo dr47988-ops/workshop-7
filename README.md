@@ -56,6 +56,79 @@ comprueba creación, consultas, actualización, participantes, permisos,
 eliminación y acceso sin sesión. Los usuarios de prueba permanecen en la BD;
 el viaje se elimina al finalizar correctamente.
 
+## Gastos
+
+Todos los endpoints de gastos requieren sesión. Un gasto siempre pertenece a
+un viaje; al eliminar el viaje se eliminan también sus gastos.
+
+### Registrar un gasto
+
+`POST /trips/:tripId/expenses`, cuerpo JSON:
+
+```json
+{
+  "description": "Hotel",
+  "amount": 100,
+  "paidBy": "ID_DEL_MIEMBRO_QUE_PAGO",
+  "splitType": "equal",
+  "participants": ["ID_MIEMBRO_1", "ID_MIEMBRO_2"]
+}
+```
+
+`description` y `amount` son obligatorios. `amount` debe ser un número mayor
+que 0 con máximo 2 decimales. `paidBy` es opcional (por defecto el usuario
+autenticado) y debe ser miembro del viaje. El servidor asigna `createdBy` y
+`trip`; no se pueden enviar.
+
+Formas de distribuir el costo (`splitType`):
+
+- `equal` (predeterminado): divide el monto en partes iguales entre
+  `participants`. Si no se envía, se reparte entre todos los miembros. Los
+  centavos sobrantes se asignan a los primeros participantes (100 entre 3 =
+  33.34, 33.33, 33.33).
+- `custom`: requiere `splits`, una lista de `{ "user", "amount" }` cuya suma
+  debe ser igual a `amount`.
+
+```json
+{
+  "description": "Tour",
+  "amount": 80,
+  "splitType": "custom",
+  "splits": [
+    { "user": "ID_MIEMBRO_1", "amount": 50 },
+    { "user": "ID_MIEMBRO_2", "amount": 30 }
+  ]
+}
+```
+
+Todos los usuarios de `participants` y `splits` deben ser miembros del viaje,
+sin repetidos. El gasto se responde con `paidBy`, `createdBy` y `splits.user`
+poblados con ID, nombre y correo.
+
+| Método y ruta | Resultado | Permiso |
+| --- | --- | --- |
+| POST /trips/:tripId/expenses | 201, `{ expense }` | Miembro del viaje |
+| GET /trips/:tripId/expenses | 200, `{ expenses, total }`, del más reciente | Miembro del viaje |
+| PATCH /expenses/:expenseId | 200, `{ expense }` | Creador del gasto o propietario del viaje |
+| DELETE /expenses/:expenseId | 204, sin cuerpo | Creador del gasto o propietario del viaje |
+
+PATCH admite cualquier subconjunto no vacío de los campos de creación. Si
+cambia `amount` o `splitType` sin enviar un nuevo reparto, se recalcula entre
+los mismos usuarios del reparto actual; en `custom` la suma debe seguir
+coincidiendo con el monto.
+
+Errores: 400 para datos, montos, repartos o identificadores inválidos, 401 sin
+sesión, 403 si el usuario no es miembro del viaje o no es creador del gasto ni
+propietario del viaje, y 404 para viaje o gasto inexistente.
+
+### Pruebas de Postman de gastos
+
+Importar `postman/expenses.postman_collection.json` y ejecutarla completa con
+Collection Runner, igual que la de viajes. Registra propietario, miembro y
+usuario externo; comprueba repartos equitativo y personalizado, validaciones de
+monto, consulta, permisos de edición y eliminación, eliminación en cascada al
+borrar el viaje y acceso sin sesión.
+
 ### Pruebas automatizadas
 
 Ejecutar `npm test`. La prueba levanta la aplicación y una instancia temporal
