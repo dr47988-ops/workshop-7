@@ -1,0 +1,756 @@
+{
+  "info": {
+    "name": "Workshop 7 - Viajes y participantes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.info.iteration === 0 && pm.info.requestName === 'Registrar owner') pm.collectionVariables.set('runId', pm.variables.replaceIn('{{$guid}}')); "
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Registrar owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"owner\",\n  \"email\": \"owner-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar owner\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ownerId', pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar member",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"member\",\n  \"email\": \"member-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar member\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('memberId', pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar outsider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"outsider\",\n  \"email\": \"outsider-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registrar outsider\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('outsiderId', pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"owner-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión owner\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crear viaje",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Viaje a Guanacaste\",\n  \"destination\": \"Liberia\",\n  \"description\": \"Vacaciones\",\n  \"startDate\": \"2027-01-10\",\n  \"endDate\": \"2027-01-15\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Crear viaje\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('tripId', pm.response.json().trip._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar viajes del propietario",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Consultar viajes del propietario\", () => pm.response.to.have.status(200));",
+              "pm.test('Contiene el viaje', () => pm.expect(pm.response.json().trips.some(t => t._id === pm.collectionVariables.get('tripId'))).to.be.true);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar detalle",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Consultar detalle\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actualizar viaje",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"destination\": \"Tamarindo\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Actualizar viaje\", () => pm.response.to.have.status(200));",
+              "pm.test('Destino actualizado', () => pm.expect(pm.response.json().trip.destination).to.eql('Tamarindo'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agregar participante",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{memberId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Agregar participante\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar participante repetido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{memberId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar participante repetido\", () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión member",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"member-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión member\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar viajes como miembro",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Consultar viajes como miembro\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar detalle como miembro",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Consultar detalle como miembro\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar participantes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}/members"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Consultar participantes\", () => pm.response.to.have.status(200));",
+              "pm.test('Dos participantes sin contraseñas', () => { const m=pm.response.json().members; pm.expect(m).to.have.length(2); m.forEach(u => pm.expect(u).not.to.have.property('password')); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Miembro no puede modificar",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"No permitido\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Miembro no puede modificar\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Miembro no puede eliminar",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Miembro no puede eliminar\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Miembro no puede agregar participantes",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{outsiderId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Miembro no puede agregar participantes\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión outsider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"outsider-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión outsider\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede consultar detalle",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede consultar detalle\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede consultar participantes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}/members"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede consultar participantes\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede modificar",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"No permitido\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede modificar\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No miembro no puede eliminar",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"No miembro no puede eliminar\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lista de no miembro vacía",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Lista de no miembro vacía\", () => pm.response.to.have.status(200));",
+              "pm.test('Sin viajes', () => pm.expect(pm.response.json().trips).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iniciar sesión owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"owner-{{runId}}@example.com\",\n  \"password\": \"Workshop123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Iniciar sesión owner\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar cambio de propietario",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"owner\": \"{{outsiderId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar cambio de propietario\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar fechas invertidas",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/trips/{{tripId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"endDate\": \"2026-01-01\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rechazar fechas invertidas\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eliminar viaje",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Eliminar viaje\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Viaje eliminado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips/{{tripId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Viaje eliminado\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cerrar sesión",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/logout",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cerrar sesión\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sin sesión",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/trips"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Sin sesión\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
