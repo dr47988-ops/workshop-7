@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const trips = require("../repositories/tripRepository");
 const users = require("../repositories/userRepository");
+const expenses = require("../repositories/expenseRepository");
 
 const fail = (statusCode, message) => {
   throw Object.assign(new Error(message), { statusCode });
@@ -69,6 +70,7 @@ module.exports = {
   async deleteTrip(tripId, userId) {
     await authorizedTrip(tripId, userId, true);
     if (!await trips.deleteTrip(tripId, userId)) fail(404, "Viaje no encontrado");
+    await expenses.deleteExpensesByTrip(tripId);
   },
   async addMember(tripId, userId, body) {
     const trip = await authorizedTrip(tripId, userId, true);
