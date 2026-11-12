@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+const { apiReference } = require("@scalar/express-api-reference");
+const swaggerSpec = require("./docs/swagger");
+
 const authRoutes = require("./routes/authRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 
@@ -23,7 +26,9 @@ app.use(cookieParser());
 // Mantener respuestas JSON cuando el cuerpo de la solicitud es inválido.
 app.use((error, req, res, next) => {
   if (error.type === "entity.parse.failed") {
-    return res.status(400).json({ message: "El cuerpo debe ser un objeto JSON válido" });
+    return res.status(400).json({
+      message: "El cuerpo debe ser un objeto JSON válido"
+    });
   }
   next(error);
 });
@@ -37,7 +42,23 @@ app.get("/", (req, res) => {
 
 // Rutas de autenticación
 app.use("/auth", authRoutes);
+
+// Rutas de viajes
 app.use("/trips", tripRoutes);
+
+// Especificación OpenAPI
+app.get("/openapi.json", (req, res) => {
+  res.json(swaggerSpec);
+});
+
+// Documentación interactiva con Scalar
+app.use(
+  "/docs",
+  apiReference({
+    url: "/openapi.json",
+    theme: "default"
+  })
+);
 
 // Manejo de rutas inexistentes
 app.use((req, res) => {

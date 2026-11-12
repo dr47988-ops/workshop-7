@@ -21,13 +21,15 @@
   },
   "homepage": "https://github.com/dr47988-ops/workshop-7#readme",
   "dependencies": {
+    "@scalar/express-api-reference": "^0.10.37",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.11.4"
+    "mongoose": "^9.11.4",
+    "swagger-jsdoc": "^6.3.0"
   },
   "devDependencies": {
     "mongodb-memory-server": "^11.3.0",
