@@ -66,7 +66,7 @@ La API utiliza una cookie llamada `token` para autenticar a los usuarios.
 
 Scalar permite visualizar los requisitos de seguridad de cada endpoint. Para probar las rutas protegidas es necesario contar con una sesión válida y enviar la cookie correspondiente.
 
-## Gestión de viajes y participantes (Persona 2)
+## Gestión de viajes y participantes 
 
 Todos los endpoints de viajes requieren iniciar sesión en `POST /auth/login`; la autenticación utiliza la cookie `token`.
 
