@@ -136,7 +136,7 @@ Cada ejecución registra tres usuarios con correos únicos, inicia sesión suces
 
 Los usuarios de prueba permanecen en la base de datos; el viaje se elimina al finalizar correctamente.
 
-## Gestión de gastos (Persona 3 del Workshop 7)
+## Gestión de gastos 
 
 Todos los endpoints de gastos requieren sesión.
 
