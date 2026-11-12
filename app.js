@@ -8,6 +8,7 @@ const swaggerSpec = require("./docs/swagger");
 
 const authRoutes = require("./routes/authRoutes");
 const tripRoutes = require("./routes/tripRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use("/auth", authRoutes);
 
 // Rutas de viajes
 app.use("/trips", tripRoutes);
+app.use("/expenses", expenseRoutes);
 
 // Especificación OpenAPI
 app.get("/openapi.json", (req, res) => {

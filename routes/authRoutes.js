@@ -156,6 +156,8 @@ router.post("/register", authController.register);
  */
 router.post("/login", authController.login);
 
+// Cerrar sesión (sin authMiddleware para poder borrar cookies expiradas o inválidas)
+router.post("/logout", authController.logout);
 /**
  * @openapi
  * /auth/logout:

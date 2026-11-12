@@ -1,12 +1,20 @@
 const mongoose = require("mongoose");
 const trips = require("../repositories/tripRepository");
 const users = require("../repositories/userRepository");
+const expenses = require("../repositories/expenseRepository");
 
 const fail = (statusCode, message) => {
   throw Object.assign(new Error(message), { statusCode });
 };
 const validId = id => typeof id === "string" && mongoose.isObjectIdOrHexString(id);
 const fields = ["name", "destination", "description", "startDate", "endDate"];
+
+// Rechaza días inexistentes como 2027-02-30, que Date.parse convierte al mes siguiente.
+function realCalendarDate(value) {
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
 
 function validateData(data, partial = false) {
   if (!data || typeof data !== "object" || Array.isArray(data)) fail(400, "Envía un objeto JSON");
@@ -20,7 +28,7 @@ function validateData(data, partial = false) {
       continue;
     }
     if (["startDate", "endDate"].includes(key)) {
-      if (typeof data[key] !== "string" || !/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(data[key]) || Number.isNaN(Date.parse(data[key]))) {
+      if (typeof data[key] !== "string" || !/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(data[key]) || Number.isNaN(Date.parse(data[key])) || !realCalendarDate(data[key])) {
         fail(400, `El campo ${key} debe ser una fecha ISO válida`);
       }
       result[key] = new Date(data[key]);
@@ -50,6 +58,7 @@ function validateDates(data) {
 }
 
 module.exports = {
+  authorizedTrip,
   async createTrip(userId, body) {
     const data = validateData(body);
     validateDates(data);
@@ -68,6 +77,7 @@ module.exports = {
   async deleteTrip(tripId, userId) {
     await authorizedTrip(tripId, userId, true);
     if (!await trips.deleteTrip(tripId, userId)) fail(404, "Viaje no encontrado");
+    await expenses.deleteExpensesByTrip(tripId);
   },
   async addMember(tripId, userId, body) {
     const trip = await authorizedTrip(tripId, userId, true);

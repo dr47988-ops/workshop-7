@@ -2,6 +2,7 @@
 const router = require("express").Router();
 const auth = require("../middlewares/authMiddleware");
 const controller = require("../controllers/tripController");
+const expenseController = require("../controllers/expenseController");
 
 /**
  * @openapi
@@ -367,5 +368,7 @@ router.delete("/:tripId", controller.remove);
 // Operaciones sobre participantes
 router.post("/:tripId/members", controller.addMember);
 router.get("/:tripId/members", controller.listMembers);
+router.post("/:tripId/expenses", expenseController.create);
+router.get("/:tripId/expenses", expenseController.list);
 
 module.exports = router;
