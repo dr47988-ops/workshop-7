@@ -17,7 +17,7 @@ API REST para gestionar viajes compartidos, participantes y gastos, desarrollada
 
 El servidor utiliza el puerto 3000 de forma predeterminada.
 
-## Documentación interactiva con Scalar (Persona 1)
+## Documentación interactiva con Scalar
 
 La API cuenta con documentación interactiva desarrollada mediante **OpenAPI 3.0.3 y Scalar**, que permite consultar las rutas, los parámetros, los cuerpos de solicitud, los ejemplos de respuestas, los códigos HTTP y los permisos necesarios.
 
