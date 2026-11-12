@@ -109,7 +109,8 @@ router.post("/register", authController.register);
  *     summary: Iniciar sesión
  *     description: >
  *       Verifica las credenciales y establece una cookie
- *       httpOnly llamada token, con duración de 24 horas.
+ *       HttpOnly llamada token, con duración de 24 horas.
+ *       La cookie utiliza SameSite=Lax y Secure en producción.
  *     requestBody:
  *       required: true
  *       content:
@@ -133,10 +134,10 @@ router.post("/register", authController.register);
  *         description: Inicio de sesión exitoso.
  *         headers:
  *           Set-Cookie:
- *             description: Cookie token de autenticación.
+ *             description: Cookie JWT de autenticación.
  *             schema:
  *               type: string
- *               example: "token=JWT; Path=/; HttpOnly; SameSite=Lax"
+ *               example: "token=JWT; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400"
  *         content:
  *           application/json:
  *             schema:
@@ -148,16 +149,22 @@ router.post("/register", authController.register);
  *                 user:
  *                   $ref: '#/components/schemas/AuthUser'
  *       400:
- *         description: Correo o contraseña faltante.
+ *         description: Datos de inicio de sesión inválidos.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthError'
  *       401:
  *         description: Credenciales incorrectas.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthError'
  *       500:
  *         description: Error interno del servidor.
  */
 router.post("/login", authController.login);
 
-// Cerrar sesión (sin authMiddleware para poder borrar cookies expiradas o inválidas)
-router.post("/logout", authController.logout);
 /**
  * @openapi
  * /auth/logout:
@@ -165,9 +172,11 @@ router.post("/logout", authController.logout);
  *     tags:
  *       - Autenticación
  *     summary: Cerrar sesión
- *     description: Elimina la cookie de autenticación token.
- *     security:
- *       - cookieAuth: []
+ *     description: >
+ *       Elimina la cookie de autenticación token.
+ *       No requiere una sesión activa, por lo que también
+ *       permite eliminar cookies expiradas o inválidas.
+ *     security: []
  *     responses:
  *       200:
  *         description: Sesión cerrada correctamente.
@@ -179,12 +188,8 @@ router.post("/logout", authController.logout);
  *                 message:
  *                   type: string
  *                   example: "Sesión cerrada correctamente"
- *       401:
- *         description: No existe una sesión válida.
- *       500:
- *         description: Error interno de autenticación.
  */
-router.post("/logout", authMiddleware, authController.logout);
+router.post("/logout", authController.logout);
 
 /**
  * @openapi
@@ -193,7 +198,9 @@ router.post("/logout", authMiddleware, authController.logout);
  *     tags:
  *       - Autenticación
  *     summary: Consultar usuario autenticado
- *     description: Devuelve los datos del usuario de la sesión.
+ *     description: >
+ *       Devuelve los datos del usuario de la sesión.
+ *       Requiere una cookie token válida.
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -211,8 +218,12 @@ router.post("/logout", authMiddleware, authController.logout);
  *                   $ref: '#/components/schemas/AuthUser'
  *       401:
  *         description: Sesión inexistente, inválida o expirada.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthError'
  *       500:
- *         description: Error interno de autenticación.
+ *         description: Error interno del servidor.
  */
 router.get("/me", authMiddleware, (req, res) => {
   res.status(200).json({
