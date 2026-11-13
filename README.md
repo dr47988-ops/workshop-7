@@ -237,19 +237,35 @@ Comprueba repartos equitativo y personalizado, validaciones de monto, consulta, 
 
 ## Pruebas automatizadas
 
-Para ejecutar las pruebas automatizadas utilizar:
+### Configurar el entorno de pruebas
+
+1. Tener instalado **Node.js 18 o superior** (las pruebas usan `node:test` y `fetch` nativos).
+2. Instalar las dependencias, incluidas las de desarrollo:
+
+   ```bash
+   npm ci
+   ```
+
+3. No hace falta crear `.env` ni tener MongoDB instalado: las pruebas configuran su propio `JWT_SECRET` y su propia base de datos.
+
+### Ejecutar las pruebas
 
 ```bash
 npm test
 ```
 
-Las pruebas levantan la aplicación y una instancia temporal real de MongoDB mediante `mongodb-memory-server`.
+También se puede ejecutar un solo archivo, por ejemplo:
 
-Registran usuarios y verifican los endpoints HTTP utilizando cookies JWT.
+```bash
+node --test tests/expenses.test.js
+```
 
-Las pruebas no utilizan la base de datos configurada en `.env`.
+### Aislamiento y limpieza
 
-La primera ejecución necesita Internet para descargar el binario de MongoDB. La instancia temporal se elimina al finalizar.
+- Cada archivo de pruebas levanta la aplicación y una instancia temporal de MongoDB mediante `mongodb-memory-server`, que se elimina al finalizar. Nunca se usa la base de datos configurada en `.env`.
+- Cada prueba es independiente: crea sus propios usuarios, viajes y gastos, y los datos que genera se eliminan al terminar (`afterEach`). Se puede ejecutar en cualquier orden y el fallo de una prueba no afecta a las demás.
+- Las pruebas verifican los endpoints HTTP reales utilizando cookies JWT.
+- La primera ejecución necesita Internet para descargar el binario de MongoDB; las siguientes lo reutilizan desde la caché.
 
 ### Casos de prueba
 
@@ -265,8 +281,8 @@ La tabla completa de casos de prueba (escenario, datos y resultado esperado) est
 
 En la última ejecución local se obtuvo:
 
-- Pruebas ejecutadas: 53
-- Pruebas aprobadas: 53
+- Pruebas ejecutadas: 72
+- Pruebas aprobadas: 72
 - Pruebas fallidas: 0
 
 Se verificaron escenarios automatizados de autenticación, viajes, participantes, gastos, validaciones y permisos.
