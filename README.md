@@ -251,15 +251,25 @@ Las pruebas no utilizan la base de datos configurada en `.env`.
 
 La primera ejecución necesita Internet para descargar el binario de MongoDB. La instancia temporal se elimina al finalizar.
 
+### Casos de prueba
+
+La tabla completa de casos de prueba (escenario, datos y resultado esperado) está en [`docs/casos-de-prueba.md`](docs/casos-de-prueba.md). Cubre autenticación, rutas protegidas, viajes, participantes y gastos, incluyendo los permisos de propietario, miembro y usuario ajeno, y las solicitudes con datos inválidos o recursos inexistentes.
+
+| Archivo | Qué verifica |
+|---|---|
+| `tests/auth.test.js` | Registro, inicio y cierre de sesión, cookie JWT y acceso a rutas protegidas con y sin sesión |
+| `tests/trips.test.js` | Viajes y participantes: creación, consulta, modificación y eliminación por propietario, miembro y ajeno |
+| `tests/expenses.test.js` | Registro, consulta, modificación y eliminación de gastos, repartos y permisos |
+
 ### Resultado de la última ejecución
 
 En la última ejecución local se obtuvo:
 
-- Pruebas ejecutadas: 2
-- Pruebas aprobadas: 2
+- Pruebas ejecutadas: 53
+- Pruebas aprobadas: 53
 - Pruebas fallidas: 0
 
-Se verificaron escenarios automatizados de viajes, participantes, gastos, validaciones y permisos.
+Se verificaron escenarios automatizados de autenticación, viajes, participantes, gastos, validaciones y permisos.
 
 ## Comandos principales
 
